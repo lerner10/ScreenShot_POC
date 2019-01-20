@@ -16,23 +16,33 @@ CountC = my_socket.recv(4096)
 numOfBytesInChunk = 8192 # 4096
 tillC = CountC.decode('utf8')
 numOfChunks = int(tillC)
-numOfChunks = numOfChunks + 1
+print("Number of chunks: " + str(numOfChunks))
 print("Receiving packets will start now if file exists.")
 # print(
 #   "Timeout is 15 seconds so please wait for timeout at the end.")
 
-bytes = bytes()
-while numOfChunks != 0:
+# bytes = bytes()
+data = []
+dataLength = 0
+while dataLength < ((numOfChunks - 1) * numOfBytesInChunk):
     chunkData = my_socket.recv(numOfBytesInChunk)
-
-    bytes += chunkData
+    data.append(chunkData)
+    dataLength += len(chunkData)
+    # bytes += chunkData
     # dataS = BigC.write(chunkData)
     d += 1
     print("Received packet number: {} with size of: {}".format(str(d), len(chunkData)))
-    numOfChunks = numOfChunks - 1
+    # numOfChunks = numOfChunks - 1
 
-print("Received data, number of bytes: " + str(len(bytes)))
-image = pickle.loads(bytes)
+chunkData = my_socket.recv(numOfBytesInChunk)
+data.append(chunkData)
+dataLength += len(chunkData)
+print("Received packet number: {} with size of: {}".format(str(d), len(chunkData)))
+
+# image = pickle.loads(bytes)
+allData = b"".join(data)
+print("Received data, number of bytes: " + str(len(allData)))
+image = pickle.loads(allData)
 image.save(r'screen.jpg')
 # dataS = BigC.write(image)
 print("New Received file closed. Check contents in your directory.")
