@@ -1,3 +1,4 @@
+import pickle
 import socket
 
 IP = '127.0.0.1'
@@ -12,20 +13,29 @@ d = 0
 
 # number of paclets
 CountC = my_socket.recv(4096)
-numOfChunks = 8192 # 4096
+numOfBytesInChunk = 8192 # 4096
 tillC = CountC.decode('utf8')
-tillCC = int(tillC)
+numOfChunks = int(tillC)
+numOfChunks = numOfChunks + 1
 print("Receiving packets will start now if file exists.")
 # print(
 #   "Timeout is 15 seconds so please wait for timeout at the end.")
-while tillCC != 0:
-    ClientBData = my_socket.recv(numOfChunks)
-    dataS = BigC.write(ClientBData)
+
+bytes = bytes()
+while numOfChunks != 0:
+    chunkData = my_socket.recv(numOfBytesInChunk)
+
+    bytes += chunkData
+    # dataS = BigC.write(chunkData)
     d += 1
-    print("Received packet number:" + str(d))
-    tillCC = tillCC - 1
-print(
-    "New Received file closed. Check contents in your directory.")
+    print("Received packet number: {} with size of: {}".format(str(d), len(chunkData)))
+    numOfChunks = numOfChunks - 1
+
+print("Received data, number of bytes: " + str(len(bytes)))
+image = pickle.loads(bytes)
+image.save(r'screen.jpg')
+# dataS = BigC.write(image)
+print("New Received file closed. Check contents in your directory.")
 BigC.close()
 
 # with open(file_name, 'wb') as file:
