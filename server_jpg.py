@@ -1,8 +1,9 @@
-import socket
-import PIL.ImageGrab
-import time
-import os
 import datetime
+import os
+import socket
+import time
+
+import PIL.ImageGrab
 
 IP = '0.0.0.0'
 PORT = 60000
@@ -13,23 +14,23 @@ server_socket.bind((IP, PORT))
 
 server_socket.listen(1)
 
+print('Listening to new connection')
 client_socket, client_address = server_socket.accept()
 
-
-
-print(datetime.datetime.now().time())
+startTime = time.clock()
+print('Starting time: {}'.format(datetime.datetime.now().time()))
 
 im = PIL.ImageGrab.grab()
-im.save(r'C:\Users\AMIT\PycharmProjects\project\screen.jpg')
+im.save(r'screen.jpg')
 
-
-g = r'C:\Users\AMIT\PycharmProjects\project\screen.jpg'
+g = r'C:\PythonProjects\ScreenShot_POC\screen.jpg'
 
 c = 0
 sizeS = os.stat(g)
 sizeSS = sizeS.st_size  # number of packets
 print("File size in bytes:" + str(sizeSS))
-NumS = int(sizeSS / 4096)
+numOfChunks = 8192 # 4096
+NumS = int(sizeSS / numOfChunks)
 NumS = NumS + 1
 tillSS = str(NumS)
 tillSSS = tillSS.encode('utf8')
@@ -38,7 +39,7 @@ client_socket.send(tillSSS)
 check = int(NumS)
 GetRunS = open(g, "rb")
 while check != 0:
-    RunS = GetRunS.read(4096)
+    RunS = GetRunS.read(numOfChunks)
     client_socket.send(RunS)
     c += 1
     check -= 1
@@ -46,10 +47,7 @@ while check != 0:
     print("Data sending in process:")
 GetRunS.close()
 print("Sent from Server - Get function")
-print(datetime.datetime.now().time())
-
-
-
+print('End time: {}'.format(datetime.datetime.now().time()))
 
 # path = r'C:\Users\AMIT\PycharmProjects\project\screen.jpg'
 #
@@ -61,5 +59,10 @@ print(datetime.datetime.now().time())
 #         server_socket.sendto(byte_temporal, client_address)
 #     byte_ending_message = 'Transferring succeeded'.encode('utf-8')
 #     server_socket.sendto(byte_ending_message, client_address)
+
+
+endTime = time.clock()
+duration = endTime - startTime
+print('Took time: {time}'.format(time=duration))
 
 server_socket.close()
